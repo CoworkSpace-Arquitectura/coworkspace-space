@@ -1,16 +1,46 @@
 @baseUrl = http://localhost:3001
 
-### 1. Crear una sede
+### Crear una sede
+# @name sede
 POST {{baseUrl}}/locations
 Content-Type: application/json
 
 { "name": "Sede Centro", "city": "Montería", "address": "Calle 30 #5-20" }
 
-### 2. Listar sedes
+### Listar sedes
 GET {{baseUrl}}/locations
 
-### 3. Validación: debe fallar con 400
+### Validación: debe fallar con 400
 POST {{baseUrl}}/locations
 Content-Type: application/json
 
 { "name": "Sede Norte" }
+
+### Crear una sala en la sede
+POST {{baseUrl}}/rooms
+Content-Type: application/json
+
+{
+  "locationId": "{{sede.response.body.id}}",
+  "name": "Sala Caribe",
+  "capacity": 8,
+  "equipment": { "proyector": true, "pizarra": true }
+}
+
+### Salas con capacidad mínima de 6
+GET {{baseUrl}}/rooms?minCapacity=6
+
+### Crear un puesto en la sede
+POST {{baseUrl}}/desks
+Content-Type: application/json
+
+{ "locationId": "{{sede.response.body.id}}", "code": "D-01", "isDedicated": false }
+
+### Ver la sede con sus salas y puestos
+GET {{baseUrl}}/locations/{{sede.response.body.id}}
+
+### Sala en una sede inexistente: debe fallar con 404
+POST {{baseUrl}}/rooms
+Content-Type: application/json
+
+{ "locationId": "00000000-0000-4000-8000-000000000000", "name": "Sala X", "capacity": 4 }
