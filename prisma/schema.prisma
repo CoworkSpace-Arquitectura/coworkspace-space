@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  address   String
+  createdAt DateTime @default(now()) @map("created_at")
+  rooms     Room[]
+  desks     Desk[]
+
+  @@map("locations")
+}
+
+model Room {
+  id         String   @id @default(uuid())
+  locationId String   @map("location_id")
+  name       String
+  capacity   Int
+  equipment  Json     @default("{}")
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+  @@map("rooms")
+}
+
+model Desk {
+  id          String   @id @default(uuid())
+  locationId  String   @map("location_id")
+  code        String
+  isDedicated Boolean  @default(false) @map("is_dedicated")
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+  @@map("desks")
+}
