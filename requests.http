@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:3001
+
+### 1. Crear una sede
+POST {{baseUrl}}/locations
+Content-Type: application/json
+
+{ "name": "Sede Centro", "city": "Montería", "address": "Calle 30 #5-20" }
+
+### 2. Listar sedes
+GET {{baseUrl}}/locations
+
+### 3. Validación: debe fallar con 400
+POST {{baseUrl}}/locations
+Content-Type: application/json
+
+{ "name": "Sede Norte" }
