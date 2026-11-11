@@ -12,10 +12,13 @@ model Location {
   name      String
   city      String
   address   String
+  country   String   @default("CO")
+  currency  String   @default("COP")
   createdAt DateTime @default(now()) @map("created_at")
   rooms     Room[]
   desks     Desk[]
 
+  @@index([country])
   @@map("locations")
 }
 
@@ -25,6 +28,7 @@ model Room {
   name       String
   capacity   Int
   equipment  Json     @default("{}")
+  hourlyRate Int      @default(30000) @map("hourly_rate")
   location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@index([locationId])
@@ -36,6 +40,7 @@ model Desk {
   locationId  String   @map("location_id")
   code        String
   isDedicated Boolean  @default(false) @map("is_dedicated")
+  hourlyRate  Int      @default(15000) @map("hourly_rate")
   location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@index([locationId])

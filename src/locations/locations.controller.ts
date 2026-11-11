@@ -12,9 +12,9 @@ export class LocationsController {
     return this.locationsService.create(dto);
   }
 
-  @Get()
-  findAll(@Query('city') city?: string) {
-    return this.locationsService.findAll(city);
+   @Get()
+  findAll(@Query('city') city?: string, @Query('country') country?: string) {
+    return this.locationsService.findAll(city, country);
   }
 
   @Get(':id')

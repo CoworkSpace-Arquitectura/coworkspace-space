@@ -20,7 +20,10 @@ export class DesksService {
   }
 
   async findOne(id: string) {
-    const desk = await this.prisma.desk.findUnique({ where: { id } });
+    const desk = await this.prisma.desk.findUnique({
+      where: { id },
+      include: { location: { select: { name: true, city: true, country: true, currency: true } } },
+    });
     if (!desk) {
       throw new NotFoundException(`Puesto ${id} no encontrado`);
     }

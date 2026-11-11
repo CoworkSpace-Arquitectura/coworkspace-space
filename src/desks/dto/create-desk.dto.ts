@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class CreateDeskDto {
   @IsUUID()
@@ -11,4 +11,9 @@ export class CreateDeskDto {
   @IsOptional()
   @IsBoolean()
   isDedicated?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  hourlyRate?: number;
 }

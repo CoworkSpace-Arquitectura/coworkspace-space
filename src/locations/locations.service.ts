@@ -11,9 +11,9 @@ export class LocationsService {
     return this.prisma.location.create({ data: dto });
   }
 
-  findAll(city?: string) {
+   findAll(city?: string, country?: string) {
     return this.prisma.location.findMany({
-      where: city ? { city } : undefined,
+      where: { city, country },
       orderBy: { name: 'asc' },
     });
   }

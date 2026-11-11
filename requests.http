@@ -44,3 +44,29 @@ POST {{baseUrl}}/rooms
 Content-Type: application/json
 
 { "locationId": "00000000-0000-4000-8000-000000000000", "name": "Sala X", "capacity": 4 }
+
+### Crear una sede en México
+# @name sedeMx
+POST {{baseUrl}}/locations
+Content-Type: application/json
+
+{ "name": "Sede Polanco", "city": "Ciudad de México", "address": "Av. Presidente Masaryk 111", "country": "MX", "currency": "MXN" }
+
+### Crear una sala con tarifa en pesos mexicanos
+# @name salaMx
+POST {{baseUrl}}/rooms
+Content-Type: application/json
+
+{ "locationId": "{{sedeMx.response.body.id}}", "name": "Sala Reforma", "capacity": 10, "hourlyRate": 350 }
+
+### Sedes de México
+GET {{baseUrl}}/locations?country=MX
+
+### Ver la sala: debe incluir la sede con su moneda
+GET {{baseUrl}}/rooms/{{salaMx.response.body.id}}
+
+### País inválido: debe fallar con 400
+POST {{baseUrl}}/locations
+Content-Type: application/json
+
+{ "name": "Sede X", "city": "X", "address": "X", "country": "Mexico" }

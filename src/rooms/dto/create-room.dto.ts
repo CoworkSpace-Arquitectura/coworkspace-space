@@ -15,4 +15,10 @@ export class CreateRoomDto {
   @IsOptional()
   @IsObject()
   equipment?: Record<string, string | number | boolean>;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  hourlyRate?: number;
+
 }
