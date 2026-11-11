@@ -8,12 +8,12 @@ export class RoomsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateRoomDto) {
-  await this.ensureLocation(dto.locationId);
-  const { locationId, name, capacity, equipment } = dto;
-  return this.prisma.room.create({
-    data: { locationId, name, capacity, equipment: equipment ?? {} },
-  });
-}
+    await this.ensureLocation(dto.locationId);
+    const { locationId, name, capacity, equipment, hourlyRate } = dto;
+    return this.prisma.room.create({
+      data: { locationId, name, capacity, hourlyRate, equipment: equipment ?? {} },
+    });
+  }
 
   findAll(locationId?: string, minCapacity?: number) {
     return this.prisma.room.findMany({

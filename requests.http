@@ -70,3 +70,9 @@ POST {{baseUrl}}/locations
 Content-Type: application/json
 
 { "name": "Sede X", "city": "X", "address": "X", "country": "Mexico" }
+
+### Corregir la tarifa de la sala de México
+PATCH {{baseUrl}}/rooms/{{salaMx.response.body.id}}
+Content-Type: application/json
+
+{ "hourlyRate": 350 }
