@@ -1,4 +1,18 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseEnumPipe,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { RoomKind } from '@prisma/client';
+import { CurrentActor, type Actor } from '../common/actor.js';
 import { RoomsService } from './rooms.service.js';
 import { CreateRoomDto } from './dto/create-room.dto.js';
 import { UpdateRoomDto } from './dto/update-room.dto.js';
@@ -8,16 +22,17 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  create(@Body() dto: CreateRoomDto) {
-    return this.roomsService.create(dto);
+  create(@CurrentActor() actor: Actor, @Body() dto: CreateRoomDto) {
+    return this.roomsService.create(actor, dto);
   }
 
   @Get()
   findAll(
     @Query('locationId') locationId?: string,
     @Query('minCapacity', new ParseIntPipe({ optional: true })) minCapacity?: number,
+    @Query('kind', new ParseEnumPipe(RoomKind, { optional: true })) kind?: RoomKind,
   ) {
-    return this.roomsService.findAll(locationId, minCapacity);
+    return this.roomsService.findAll(locationId, minCapacity, kind);
   }
 
   @Get(':id')
@@ -26,12 +41,16 @@ export class RoomsController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateRoomDto) {
-    return this.roomsService.update(id, dto);
+  update(
+    @CurrentActor() actor: Actor,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateRoomDto,
+  ) {
+    return this.roomsService.update(actor, id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.roomsService.remove(id);
+  remove(@CurrentActor() actor: Actor, @Param('id', ParseUUIDPipe) id: string) {
+    return this.roomsService.remove(actor, id);
   }
 }

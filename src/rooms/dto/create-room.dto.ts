@@ -1,4 +1,5 @@
-import { IsInt, IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { RoomKind } from '@prisma/client';
+import { IsEnum, IsInt, IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class CreateRoomDto {
   @IsUUID()
@@ -7,6 +8,11 @@ export class CreateRoomDto {
   @IsString()
   @IsNotEmpty()
   name!: string;
+
+  /** Sala de reuniones, oficina privada, auditorio o cabina telefónica. */
+  @IsOptional()
+  @IsEnum(RoomKind)
+  kind?: RoomKind;
 
   @IsInt()
   @Min(1)
@@ -20,5 +26,4 @@ export class CreateRoomDto {
   @IsInt()
   @Min(0)
   hourlyRate?: number;
-
 }

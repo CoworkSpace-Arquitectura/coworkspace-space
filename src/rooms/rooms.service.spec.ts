@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { RoomsService } from './rooms.service.js';
 import type { PrismaService } from '../prisma/prisma.service.js';
+import type { Actor } from '../common/actor.js';
+
+const gerente: Actor = { id: 'gerente-1', role: 'MANAGER' };
+const otroGerente: Actor = { id: 'gerente-2', role: 'MANAGER' };
 
 describe('RoomsService', () => {
   const prisma = {
@@ -23,30 +27,41 @@ describe('RoomsService', () => {
     service = new RoomsService(prisma as unknown as PrismaService);
   });
 
-  it('crea una sala si la sede existe', async () => {
-    prisma.location.findUnique.mockResolvedValue({ id: 'sede-1' });
+  it('el gerente de la sede crea una sala', async () => {
+    prisma.location.findUnique.mockResolvedValue({ id: 'sede-1', managerId: 'gerente-1' });
     prisma.room.create.mockResolvedValue({ id: 'sala-1', ...dto, equipment: {} });
 
-    const result = await service.create(dto);
+    const result = await service.create(gerente, { ...dto, kind: 'PRIVATE_OFFICE' });
 
-    expect(prisma.room.create).toHaveBeenCalledWith({ data: { ...dto, equipment: {} } });
+    expect(prisma.room.create).toHaveBeenCalledWith({
+      data: { ...dto, kind: 'PRIVATE_OFFICE', hourlyRate: undefined, equipment: {} },
+    });
     expect(result.id).toBe('sala-1');
+  });
+
+  it('otro gerente no puede crear salas en una sede ajena', async () => {
+    prisma.location.findUnique.mockResolvedValue({ id: 'sede-1', managerId: 'gerente-1' });
+
+    await expect(service.create(otroGerente, dto)).rejects.toBeInstanceOf(ForbiddenException);
+    expect(prisma.room.create).not.toHaveBeenCalled();
   });
 
   it('no crea la sala si la sede no existe', async () => {
     prisma.location.findUnique.mockResolvedValue(null);
 
-    await expect(service.create(dto)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.create(gerente, dto)).rejects.toBeInstanceOf(NotFoundException);
     expect(prisma.room.create).not.toHaveBeenCalled();
   });
 
-  it('filtra por capacidad mínima', async () => {
+  it('filtra por capacidad mínima y tipo de espacio', async () => {
     prisma.room.findMany.mockResolvedValue([]);
 
-    await service.findAll(undefined, 6);
+    await service.findAll(undefined, 6, 'AUDITORIUM');
 
     expect(prisma.room.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { locationId: undefined, capacity: { gte: 6 } } }),
+      expect.objectContaining({
+        where: { locationId: undefined, kind: 'AUDITORIUM', capacity: { gte: 6 } },
+      }),
     );
   });
 });

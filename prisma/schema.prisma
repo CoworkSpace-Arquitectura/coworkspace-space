@@ -8,24 +8,53 @@ datasource db {
 }
 
 model Location {
-  id        String   @id @default(uuid())
-  name      String
-  city      String
-  address   String
-  country   String   @default("CO")
-  currency  String   @default("COP")
-  createdAt DateTime @default(now()) @map("created_at")
-  rooms     Room[]
-  desks     Desk[]
+  id          String          @id @default(uuid())
+  name        String
+  city        String
+  address     String
+  country     String          @default("CO")
+  currency    String          @default("COP")
+  description String          @default("")
+  amenities   String[]        @default([])
+  latitude    Float?
+  longitude   Float?
+  managerId   String?         @map("manager_id")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  rooms       Room[]
+  desks       Desk[]
+  photos      LocationPhoto[]
 
   @@index([country])
+  @@index([managerId])
   @@map("locations")
+}
+
+model LocationPhoto {
+  id         String   @id @default(uuid())
+  locationId String   @map("location_id")
+  url        String?
+  data       Bytes?
+  mimeType   String?  @map("mime_type")
+  position   Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+  @@map("location_photos")
+}
+
+enum RoomKind {
+  MEETING_ROOM
+  PRIVATE_OFFICE
+  AUDITORIUM
+  PHONE_BOOTH
 }
 
 model Room {
   id         String   @id @default(uuid())
   locationId String   @map("location_id")
   name       String
+  kind       RoomKind @default(MEETING_ROOM)
   capacity   Int
   equipment  Json     @default("{}")
   hourlyRate Int      @default(30000) @map("hourly_rate")
