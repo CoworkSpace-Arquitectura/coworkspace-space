@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsTimeZone,
   IsUUID,
   Max,
   MaxLength,
@@ -33,6 +34,11 @@ export class CreateLocationDto {
   @IsOptional()
   @IsISO4217CurrencyCode()
   currency?: string;
+
+  /** Zona horaria IANA. Si no se envía, se deduce del país. */
+  @IsOptional()
+  @IsTimeZone()
+  timeZone?: string;
 
   @IsOptional()
   @IsString()

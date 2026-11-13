@@ -33,7 +33,17 @@ describe('LocationsService', () => {
     await service.create(gerente, { ...dto, managerId: 'otra-persona' });
 
     expect(prisma.location.create).toHaveBeenCalledWith({
-      data: { ...dto, managerId: 'gerente-1' },
+      data: { ...dto, timeZone: 'America/Bogota', managerId: 'gerente-1' },
+    });
+  });
+
+  it('deduce la zona horaria del país si no se indica', async () => {
+    prisma.location.create.mockResolvedValue({ id: 'sede-2' });
+
+    await service.create(gerente, { ...dto, city: 'Madrid', country: 'ES', currency: 'EUR' });
+
+    expect(prisma.location.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ timeZone: 'Europe/Madrid' }),
     });
   });
 
@@ -43,7 +53,7 @@ describe('LocationsService', () => {
     await service.create(jefe, { ...dto, managerId: 'gerente-1' });
 
     expect(prisma.location.create).toHaveBeenCalledWith({
-      data: { ...dto, managerId: 'gerente-1' },
+      data: { ...dto, timeZone: 'America/Bogota', managerId: 'gerente-1' },
     });
   });
 

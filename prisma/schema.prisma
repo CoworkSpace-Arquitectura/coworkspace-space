@@ -14,6 +14,8 @@ model Location {
   address     String
   country     String          @default("CO")
   currency    String          @default("COP")
+  /// Zona horaria IANA de la sede (ej. Europe/Madrid): las horas de reserva se eligen en esta zona
+  timeZone    String          @default("America/Bogota") @map("time_zone")
   description String          @default("")
   amenities   String[]        @default([])
   latitude    Float?

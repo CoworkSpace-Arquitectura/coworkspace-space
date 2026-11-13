@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { assertOwner, assertStaff, type Actor } from '../common/actor.js';
 import { ensureCanManageLocation } from '../common/location-access.js';
 import { PHOTO_SELECT, withPhotoSrc } from '../photos/photo-src.js';
+import { defaultTimeZone } from './time-zones.js';
 import { CreateLocationDto } from './dto/create-location.dto.js';
 import { UpdateLocationDto } from './dto/update-location.dto.js';
 
@@ -22,6 +23,7 @@ export class LocationsService {
     return this.prisma.location.create({
       data: {
         ...data,
+        timeZone: data.timeZone ?? defaultTimeZone(data.country),
         // El jefe puede asignarla a un gerente; un gerente siempre se la queda él.
         managerId: actor.role === 'OWNER' ? (managerId ?? null) : actor.id,
       },
