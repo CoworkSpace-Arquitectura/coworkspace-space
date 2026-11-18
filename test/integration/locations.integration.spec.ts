@@ -57,4 +57,10 @@ describe('Sedes (integración con la base de datos)', () => {
     await request(app.getHttpServer()).delete(`/locations/${locationId}`).set(jefe).expect(200);
     await request(app.getHttpServer()).get(`/locations/${locationId}`).expect(404);
   });
+
+  it('publica la documentación de la API (OpenAPI)', async () => {
+    const res = await request(app.getHttpServer()).get('/docs-json').expect(200);
+    expect(res.body.openapi).toBeDefined();
+    expect(Object.keys(res.body.paths).length).toBeGreaterThan(0);
+  });
 });
